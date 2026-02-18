@@ -35,9 +35,8 @@
   const soundMap = {
     "!bruh": "https://www.myinstants.com/media/sounds/movie_1.mp3",
     "!horn": "https://www.myinstants.com/media/sounds/air-horn-club-sample_1.mp3",
-
-    // Slot machine: lever + reels spin + stop (more “arcade spin” vibe)
-    "!spin": "https://orangefreesounds.com/wp-content/uploads/2024/12/Slot-machine-sound-effect.mp3"
+    "!spin": "https://orangefreesounds.com/wp-content/uploads/2024/12/Slot-machine-sound-effect.mp3",
+    "!sad": "https://www.myinstants.com/media/sounds/sad-trombone.mp3"
   };
 
   const COOLDOWN_MS = 2000;
@@ -59,10 +58,13 @@
 
     const audio = new Audio(url);
     audio.volume = 0.9;
-    audio.play().catch(e => console.log("Audio blocked:", e));
+    audio.play().catch(() => {});
   }
 
-  const client = new tmi.Client({ channels: [channelName] });
+  const client = new tmi.Client({
+    channels: [channelName]
+  });
+
   await client.connect();
 
   client.on("message", (channel, tags, message, self) => {
