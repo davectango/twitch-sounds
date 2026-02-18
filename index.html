@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tango Sound Commands</title>
+<script src="https://unpkg.com/tmi.js@1.8.5/dist/tmi.min.js"></script>
+</head>
+<body style="background: transparent;">
+
+<script>
+const channelName = "tangoplaysdead"; // lowercase
+
+const soundMap = {
+  "!bruh": "https://www.myinstants.com/media/sounds/movie_1.mp3",
+  "!airhorn": "https://www.myinstants.com/media/sounds/airhorn.mp3"
+};
+
+let cooldown = false;
+
+function playSound(url) {
+  if (cooldown) return;
+  cooldown = true;
+
+  const audio = new Audio(url);
+  audio.volume = 0.9;
+  audio.play().catch(()=>{});
+
+  setTimeout(() => cooldown = false, 2000);
+}
+
+const client = new tmi.Client({
+  channels: [channelName]
+});
+
+client.connect();
+
+client.on('message', (channel, tags, message, self) => {
+  if (self) return;
+
+  const cmd = message.trim().split(" ")[0].toLowerCase();
+  if (soundMap[cmd]) {
+    playSound(soundMap[cmd]);
+  }
+});
+</script>
+
+</body>
+</html>
