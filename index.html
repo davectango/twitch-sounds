@@ -30,7 +30,7 @@
     <input type="checkbox" id="enableToggle">
     Enable Sound Commands
   </label>
-  <div>Click once before stream, then you can minimize this window.</div>
+  <div>Click once before stream, then minimize.</div>
 </div>
 
 <script type="module">
@@ -41,7 +41,9 @@
   const soundMap = {
     "!bruh": "https://www.myinstants.com/media/sounds/movie_1.mp3",
     "!horn": "https://www.myinstants.com/media/sounds/air-horn-club-sample_1.mp3",
-    "!spin": "https://www.orangefreesounds.com/wp-content/uploads/2019/08/Slot-machine-jackpot-many-coins-falling.mp3"
+
+    // NEW SPIN SOUND (mechanical slot reel spin)
+    "!spin": "https://www.soundjay.com/casino/sounds/slot-machine-1.mp3"
   };
 
   const COOLDOWN_MS = 2000;
@@ -71,7 +73,6 @@
   });
 
   await client.connect();
-  console.log("Connected to Twitch chat:", channelName);
 
   client.on("message", (channel, tags, message, self) => {
     if (self) return;
@@ -81,7 +82,6 @@
     const url = soundMap[cmd];
     if (url) playSound(url);
   });
-
 </script>
 
 </body>
