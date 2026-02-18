@@ -5,77 +5,94 @@
 <title>Tango Sound Commands</title>
 
 <style>
-html, body {
-    margin: 0;
-    padding: 0;
-    background: white;
-    font-family: Arial, sans-serif;
+body{
+  margin:0;
+  padding:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  font-family:Arial, sans-serif;
+  background:white;
 }
 
-/* PANEL */
-.panel {
-    padding: 40px;
+.panel{
+  text-align:center;
 }
 
-/* TOGGLE SWITCH */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
+.switch{
+  position:relative;
+  display:inline-block;
+  width:60px;
+  height:34px;
 }
 
-.switch input {
-  display: none;
+.switch input{
+  opacity:0;
+  width:0;
+  height:0;
 }
 
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: red;
-  transition: .4s;
-  border-radius: 34px;
+.slider{
+  position:absolute;
+  cursor:pointer;
+  top:0; left:0; right:0; bottom:0;
+  background-color:#e74c3c;
+  transition:.4s;
+  border-radius:34px;
 }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
+.slider:before{
+  position:absolute;
+  content:"";
+  height:26px;
+  width:26px;
+  left:4px;
+  bottom:4px;
+  background:white;
+  transition:.4s;
+  border-radius:50%;
 }
 
-input:checked + .slider {
-  background-color: #00cc44;
+input:checked + .slider{
+  background-color:#2ecc71;
 }
 
-input:checked + .slider:before {
-  transform: translateX(26px);
+input:checked + .slider:before{
+  transform:translateX(26px);
 }
 
-.status {
-  margin-top: 20px;
-  font-size: 18px;
+#status{
+  margin-top:15px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+#connectionStatus{
+  margin-top:5px;
+  font-size:14px;
+  color:gray;
+}
+
+.hint{
+  margin-top:10px;
+  font-size:13px;
+  color:#666;
 }
 </style>
 </head>
 
 <body>
+
 <div class="panel">
+  <label class="switch">
+    <input type="checkbox" id="enableSwitch">
+    <span class="slider"></span>
+  </label>
 
-<label class="switch">
-  <input type="checkbox" id="enableToggle">
-  <span class="slider"></span>
-</label>
-
-<div class="status" id="statusText">OFF</div>
-<div>Click the switch once before stream, then you can minimize this window.</div>
-
+  <div id="status">OFF</div>
+  <div id="connectionStatus"></div>
+  <div class="hint">Click switch once before stream</div>
 </div>
 
 <script type="module">
@@ -84,46 +101,51 @@ import tmi from "https://esm.sh/tmi.js@1.8.5";
 const channelName = "tangoplaysdead";
 
 const soundMap = {
-    "!bruh": "https://www.myinstants.com/media/sounds/movie_1.mp3",
-    "!horn": "https://www.myinstants.com/media/sounds/airhorn.mp3",
-    "!spin": "https://www.myinstants.com/media/sounds/slot-machine.mp3"
+  "!bruh": "https://www.myinstants.com/media/sounds/movie_1.mp3",
+  "!horn": "https://www.myinstants.com/media/sounds/air-horn-club-sample_1.mp3",
+  "!spin": "https://www.myinstants.com/media/sounds/slot-machine.mp3"
 };
 
 let enabled = false;
 let lastPlay = 0;
 const COOLDOWN_MS = 2000;
 
-const toggle = document.getElementById("enableToggle");
-const statusText = document.getElementById("statusText");
+const enableSwitch = document.getElementById("enableSwitch");
+const statusDiv = document.getElementById("status");
+const connectionDiv = document.getElementById("connectionStatus");
 
-toggle.addEventListener("change", () => {
-    enabled = toggle.checked;
-    statusText.textContent = enabled ? "ON - Connected" : "OFF";
+enableSwitch.addEventListener("change", () => {
+  enabled = enableSwitch.checked;
+  statusDiv.textContent = enabled ? "ON" : "OFF";
 });
 
-function playSound(url) {
-    const now = Date.now();
-    if (now - lastPlay < COOLDOWN_MS) return;
-    lastPlay = now;
+function playSound(url){
+  if(!enabled) return;
 
-    const audio = new Audio(url);
-    audio.volume = 0.9;
-    audio.play().catch(() => {});
+  const now = Date.now();
+  if(now - lastPlay < COOLDOWN_MS) return;
+  lastPlay = now;
+
+  const audio = new Audio(url);
+  audio.volume = 0.9;
+  audio.play().catch(()=>{});
 }
 
 const client = new tmi.Client({
-    channels: [channelName]
+  channels:[channelName]
 });
 
 await client.connect();
+connectionDiv.textContent = "Connected to Twitch chat";
 
-client.on("message", (channel, tags, message, self) => {
-    if (self || !enabled) return;
+client.on("message",(channel,tags,message,self)=>{
+  if(self) return;
 
-    const cmd = message.trim().split(" ")[0].toLowerCase();
-    const url = soundMap[cmd];
-    if (url) playSound(url);
+  const cmd = message.trim().split(" ")[0].toLowerCase();
+  const url = soundMap[cmd];
+  if(url) playSound(url);
 });
 </script>
+
 </body>
 </html>
