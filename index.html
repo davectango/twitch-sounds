@@ -12,14 +12,8 @@
       font-family: Arial, sans-serif;
     }
 
-    .panel {
-      padding: 20px;
-    }
-
-    .status {
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
+    .panel { padding: 20px; }
+    .status { margin-bottom: 10px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -42,8 +36,8 @@
     "!bruh": "https://www.myinstants.com/media/sounds/movie_1.mp3",
     "!horn": "https://www.myinstants.com/media/sounds/air-horn-club-sample_1.mp3",
 
-    // NEW SPIN SOUND (mechanical slot reel spin)
-    "!spin": "https://www.soundjay.com/casino/sounds/slot-machine-1.mp3"
+    // Slot machine: lever + reels spin + stop (more “arcade spin” vibe)
+    "!spin": "https://orangefreesounds.com/wp-content/uploads/2024/12/Slot-machine-sound-effect.mp3"
   };
 
   const COOLDOWN_MS = 2000;
@@ -68,10 +62,7 @@
     audio.play().catch(e => console.log("Audio blocked:", e));
   }
 
-  const client = new tmi.Client({
-    channels: [channelName]
-  });
-
+  const client = new tmi.Client({ channels: [channelName] });
   await client.connect();
 
   client.on("message", (channel, tags, message, self) => {
