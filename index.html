@@ -3,12 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <title>Tango Sound Commands</title>
-<script src="https://cdn.jsdelivr.net/npm/tmi.js@1.8.5/dist/tmi.min.js"></script>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+</style>
 </head>
-<body style="background: transparent;">
+<body>
 
-<script>
-const channelName = "tangoplaysdead"; // lowercase
+<script type="module">
+import tmi from "https://esm.sh/tmi.js@1.8.5";
+
+const channelName = "tangoplaysdead";
 
 const soundMap = {
   "!bruh": "https://www.myinstants.com/media/sounds/movie_1.mp3",
@@ -23,7 +31,7 @@ function playSound(url) {
 
   const audio = new Audio(url);
   audio.volume = 0.9;
-  audio.play().catch(()=>{});
+  audio.play().catch(() => {});
 
   setTimeout(() => cooldown = false, 2000);
 }
@@ -32,9 +40,10 @@ const client = new tmi.Client({
   channels: [channelName]
 });
 
-client.connect();
+await client.connect();
+console.log("Connected to Twitch");
 
-client.on('message', (channel, tags, message, self) => {
+client.on("message", (channel, tags, message, self) => {
   if (self) return;
 
   const cmd = message.trim().split(" ")[0].toLowerCase();
