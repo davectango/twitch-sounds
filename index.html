@@ -1,82 +1,88 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Tango Sound Commands</title>
+<meta charset="UTF-8">
+<title>Tango Sound Commands</title>
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: white;
-      font-family: Arial, sans-serif;
-    }
+<style>
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
 
-    .panel { padding: 20px; }
-    .status { margin-bottom: 10px; font-weight: bold; }
-  </style>
+.status {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+</style>
 </head>
 <body>
 
-<div class="panel">
-  <div class="status" id="statusText">OFF</div>
-  <label>
-    <input type="checkbox" id="enableToggle">
-    Enable Sound Commands
-  </label>
-  <div>Click once before stream, then minimize.</div>
-</div>
+<div class="status" id="statusText">OFF</div>
+
+<label>
+  <input type="checkbox" id="enableToggle">
+  Enable Sound Commands
+</label>
+
+<div>Click once before stream, then minimize this window.</div>
 
 <script type="module">
-  import tmi from "https://esm.sh/tmi.js@1.8.5";
+import tmi from "https://esm.sh/tmi.js@1.8.5";
 
-  const channelName = "tangoplaysdead";
+const channelName = "tangoplaysdead";
 
-  const soundMap = {
-    "!bruh": "https://www.myinstants.com/media/sounds/movie_1.mp3",
-    "!horn": "https://www.myinstants.com/media/sounds/air-horn-club-sample_1.mp3",
-    "!spin": "https://orangefreesounds.com/wp-content/uploads/2024/12/Slot-machine-sound-effect.mp3",
-    "!sad": "https://www.myinstants.com/media/sounds/sad-trombone.mp3",
-    "!battle": "https://www.myinstants.com/media/sounds/kshmr_war_horn_13__f_.mp3",
-    "!win": "https://www.myinstants.com/media/sounds/victory.mp3",
+// 🔥 YOUR COMMANDS
+const soundMap = {
+  "!bruh": "https://www.myinstants.com/media/sounds/movie_1.mp3",
+  "!horn": "https://www.myinstants.com/media/sounds/air-horn-club-sample_1.mp3",
+  "!spin": "https://orangefreesounds.com/wp-content/uploads/2024/12/Slot-machine-sound-effect.mp3",
+  "!sad": "https://www.myinstants.com/media/sounds/sad-trombone.mp3",
+  "!battle": "https://www.myinstants.com/media/sounds/kshmr_war_horn_13__f_.mp3",
+  "!win": "https://www.myinstants.com/media/sounds/victory.mp3",
 
-    // YOUR CUSTOM SOUND
-    "!pole": "https://davecetango.github.io/twitch-sounds/stuckonpole.mp3"
-  };
+  // 🔥 YOUR CUSTOM SOUND (MAKE SURE THIS FILE EXISTS)
+  "!pole": "https://davectango.github.io/twitch-sounds/stuckonpole.mp3"
+};
 
-  const COOLDOWN_MS = 2000;
-  let lastPlay = 0;
-  let enabled = false;
+const COOLDOWN_MS = 2000;
+let lastPlay = 0;
+let enabled = false;
 
-  const toggle = document.getElementById("enableToggle");
-  const statusText = document.getElementById("statusText");
+const toggle = document.getElementById("enableToggle");
+const statusText = document.getElementById("statusText");
 
-  toggle.addEventListener("change", () => {
-    enabled = toggle.checked;
-    statusText.textContent = enabled ? "ON - Connected" : "OFF";
-  });
+toggle.addEventListener("change", () => {
+  enabled = toggle.checked;
+  statusText.textContent = enabled ? "ON - Connected" : "OFF";
+});
 
-  function playSound(url) {
-    const now = Date.now();
-    if (now - lastPlay < COOLDOWN_MS) return;
-    lastPlay = now;
+function playSound(url) {
+  const now = Date.now();
+  if (now - lastPlay < COOLDOWN_MS) return;
+  lastPlay = now;
 
-    const audio = new Audio(url);
-    audio.volume = 0.9;
-    audio.play().catch(() => {});
+  const audio = new Audio(url);
+  audio.volume = 0.9;
+  audio.play().catch(() => {});
+}
+
+const client = new tmi.Client({
+  channels: [channelName]
+});
+
+await client.connect();
+
+client.on("message", (channel, tags, message, self) => {
+  if (self) return;
+  if (!enabled) return;
+
+  const cmd = message.trim().toLowerCase();
+  if (soundMap[cmd]) {
+    playSound(soundMap[cmd]);
   }
-
-  const client = new tmi.Client({ channels: [channelName] });
-  await client.connect();
-
-  client.on("message", (channel, tags, message, self) => {
-    if (self) return;
-    if (!enabled) return;
-
-    const cmd = message.trim().split(" ")[0].toLowerCase();
-    const url = soundMap[cmd];
-    if (url) playSound(url);
-  });
+});
 </script>
 
 </body>
